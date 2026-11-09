@@ -79,10 +79,7 @@ export default function MigrationHistoryScreen() {
                     job.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20' :
                     'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 border border-red-200/50 dark:border-red-500/20'
                   }`}>
-                    {job.status === 'COMPLETED' && '✓'}
-                    {job.status === 'IN_PROGRESS' && '●'}
-                    {job.status === 'FAILED' && '✕'}
-                    {job.status}
+                    {job.status.replace('_', ' ')}
                   </span>
                 </td>
                 <td className="py-4 px-6 text-slate-500 dark:text-slate-400">{job.startedAt}</td>

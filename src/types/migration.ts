@@ -20,3 +20,21 @@ export interface RawMigrationSummaryDTO {
   executionTimeMinutes: number;
   createdAt?: string;
 }
+
+// Represents the state of our React form before submission
+export interface MigrationTriggerForm {
+  repositoryUrl: string;
+  sourceType: 'FILE' | 'URL';
+  targetType: 'FILE' | 'URL';
+  sourceUrl?: string;
+  sourceFile?: File | null;
+  targetUrl?: string;
+  targetFile?: File | null;
+}
+
+// Represents the 202 Accepted response from the backend
+export interface MigrationTriggerResponseDTO {
+  job_id: string;
+  status: string;
+  message: string;
+}

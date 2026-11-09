@@ -1,11 +1,16 @@
+import { useState } from 'react';
 import { useMigrations } from '../../hooks/useMigrations';
 import { Link } from 'react-router-dom';
 import { Eye, CheckCircle2, XCircle, Loader2, BarChart3, Plus } from 'lucide-react';
+import NewMigrationModal from './NewMigrationModal';
 
 export default function DashboardScreen() {
 
   // migrations variable is used to store the migration summaries fetched from the backend API. The useMigrations hook provides the data, loading state, and error state for managing the API request.
   const { data: migrations, isLoading, error } = useMigrations();
+
+  // State to control the visibility of the "New Migration" modal popup form
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (isLoading) {
     return <div className="p-6 text-slate-500">Loading dashboard metrics...</div>;
@@ -29,8 +34,12 @@ export default function DashboardScreen() {
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Dashboard</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Overview of API Contract Migrations</p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-colors">
-          <Plus className="w-4 h-4" strokeWidth={2.5} />
+        {/* Button to open the New Migration modal popup */}
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
+        >
+          <Plus className="w-4 h-4 mr-2" />
           New Migration
         </button>
       </div>
@@ -99,12 +108,9 @@ export default function DashboardScreen() {
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                     job.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20' :
                     job.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20' :
-                    'bg-red-50 text-red-700 dark:bg-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-500/20'
+                    'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 border border-red-200/50 dark:border-red-500/20'
                   }`}>
-                    {job.status === 'COMPLETED' && '✓'}
-                    {job.status === 'IN_PROGRESS' && '●'}
-                    {job.status === 'FAILED' && '✕'}
-                    {job.status}
+                    {job.status.replace('_', ' ')}
                   </span>
                 </td>
                 <td className="py-4 px-6 text-slate-500 dark:text-slate-400">{job.startedAt}</td>
@@ -119,6 +125,12 @@ export default function DashboardScreen() {
           </tbody>
         </table>
       </div>
+
+      {/* Render the New Migration modal component */}
+      <NewMigrationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 }

@@ -42,6 +42,7 @@ export function useMigrations() {
     queryFn: async () => {
 
       // Fetch the raw migration data from the backend API (http://localhost:8081/api/v1/migrations)
+      // We always define the return type while calling api.get() to ensure TypeScript knows the expected structure of the response data.
       const response = await api.get<RawMigrationSummaryDTO[]>('/migrations');
       
       // Map the raw data to the frontend-friendly structure
@@ -51,12 +52,18 @@ export function useMigrations() {
         const formattedTime = timeVal > 0 ? `${timeVal.toFixed(2)} min` : '0.00 min';
         const parsedDate = formatTimestamp(item.createdAt);
 
+        let cleanStatus = item.status?.toUpperCase() || 'COMPLETED';
+        // Map backend's 'PROCESSING' to the frontend's expected 'IN_PROGRESS'
+        if (cleanStatus === 'PROCESSING') {
+          cleanStatus = 'IN_PROGRESS';
+        }
+
         // Return the mapped object with additional fields for frontend display
         return {
           jobId: item.jobId || 'N/A',
           repositoryUrl: fullUrl,
           repoName: extractRepoName(fullUrl),
-          status: (item.status?.toUpperCase() as 'IN_PROGRESS' | 'COMPLETED' | 'FAILED') || 'COMPLETED',
+          status: cleanStatus as 'IN_PROGRESS' | 'COMPLETED' | 'FAILED',
           executionTimeMinutes: timeVal,
           startedAt: parsedDate.formatted,
           timeTaken: formattedTime,
