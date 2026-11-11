@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // <-- 1. Import useNavigate
 import { X, CloudUpload, Play } from 'lucide-react';
 import { useStartMigration } from '../../hooks/useStartMigration';
 import type { MigrationTriggerForm } from '../../types/migration';
@@ -13,6 +14,7 @@ export default function NewMigrationModal({ isOpen, onClose }: NewMigrationModal
 
   // useStartMigration provides the 'mutate' function which executes the actual POST request via Axios/TanStack Query.
   const { mutate, isPending } = useStartMigration();
+  const navigate = useNavigate(); // <-- 2. Initialize the navigate hook
 
   const [formData, setFormData] = useState<MigrationTriggerForm>({
     repositoryUrl: '',
@@ -40,12 +42,20 @@ export default function NewMigrationModal({ isOpen, onClose }: NewMigrationModal
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutate(formData, {
-      onSuccess: () => {
+      // 3. Strictly type the response to prevent "Unexpected any" ESLint errors.
+      // Your Java MigrationTriggerResponse DTO returns 'jobId'.
+      onSuccess: (response: { jobId?: string; job_id?: string } | undefined) => {
         onClose();
         setFormData({
           repositoryUrl: '', sourceType: 'FILE', targetType: 'FILE',
           sourceUrl: '', sourceFile: null, targetUrl: '', targetFile: null,
         });
+
+        // 4. Safely extract the ID and trigger the redirect to the details page
+        const newJobId = response?.jobId || response?.job_id;
+        if (newJobId) {
+          navigate(`/migrations/${newJobId}`);
+        }
       }
     });
   };

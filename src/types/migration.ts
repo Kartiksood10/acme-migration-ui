@@ -38,3 +38,34 @@ export interface MigrationTriggerResponseDTO {
   status: string;
   message: string;
 }
+
+// Endpoint status log received from backend API
+export interface EndpointLogDTO {
+  endpointName: string;
+  status: string;
+}
+
+// Represents the detailed migration status response received from the backend API
+export interface MigrationStatusResponse {
+  jobId: string;
+  status: string;
+  errorMessage?: string;
+  executionTimeMinutes: number;
+  repositoryUrl: string;
+  sourceType: string;
+  targetType: string;
+  triggeredAt: string;
+  generatedPrs: string[];
+  endpointLogs: EndpointLogDTO[];
+}
+
+// Represents the frontend-friendly structure of detailed migration information, including additional fields for display purposes
+export interface MigrationDetailsUI extends MigrationStatusResponse {
+  repoName: string;
+  metrics: {
+    total: number;
+    migrated: number;
+    failed: number;
+    prs: number;
+  };
+}

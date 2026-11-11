@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useMigrations } from '../../hooks/useMigrations';
+import { useNavigate } from 'react-router-dom';
 import { Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function MigrationHistoryScreen() {
   const { data: migrations, isLoading, error } = useMigrations();
+  const navigate = useNavigate(); // Hook to handle programmatic routing
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10; // Show 10 rows per page
@@ -30,6 +33,27 @@ export default function MigrationHistoryScreen() {
   const startIndex = (currentPage - 1) * pageSize;
   const currentTableData = filteredMigrations.slice(startIndex, startIndex + pageSize);
   const endingIndex = Math.min(startIndex + pageSize, totalItems);
+
+  // Helper function to format decimal minutes into "X min Y secs" format
+  const formatTimeTaken = (timeString: string | undefined) => {
+    if (!timeString || timeString === '0.00 min') return '--'; 
+    
+    // Extract the decimal number
+    const decimalMinutes = parseFloat(timeString);
+    if (isNaN(decimalMinutes)) return timeString; 
+    
+    // Convert to total seconds
+    const totalSeconds = Math.round(decimalMinutes * 60);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    
+    if (mins === 0) {
+      return `${secs} secs`;
+    }
+    
+    return `${mins} min ${secs} secs`;
+  };
+
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -69,23 +93,39 @@ export default function MigrationHistoryScreen() {
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
             {currentTableData.map((job) => (
               <tr key={job.jobId} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors">
-                <td className="py-4 px-6 font-semibold text-blue-600 dark:text-blue-400">{job.jobId}</td>
+                
+                {/* Clickable Migration ID routing to details page */}
+                <td className="py-4 px-6 font-semibold text-blue-600 dark:text-blue-400">
+                  <button 
+                    onClick={() => navigate(`/migrations/${job.jobId}`)}
+                    className="hover:underline text-left"
+                  >
+                    {job.jobId}
+                  </button>
+                </td>
+
                 <td className="py-4 px-6 text-slate-700 dark:text-slate-300 font-medium" title={job.repositoryUrl}>
                   {job.repoName}
                 </td>
                 <td className="py-4 px-6">
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                     job.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20' :
-                    job.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20' :
-                    'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 border border-red-200/50 dark:border-red-500/20'
+                    job.status === 'FAILED' ? 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 border border-red-200/50 dark:border-red-500/20' :
+                    'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20'
                   }`}>
-                    {job.status.replace('_', ' ')}
+                    {job.status === 'COMPLETED' || job.status === 'FAILED' ? job.status.replace('_', ' ') : 'IN PROGRESS'}
                   </span>
                 </td>
                 <td className="py-4 px-6 text-slate-500 dark:text-slate-400">{job.startedAt}</td>
-                <td className="py-4 px-4 text-slate-500 dark:text-slate-400">{job.timeTaken}</td>
+                <td className="py-4 px-4 text-slate-500 dark:text-slate-400">{formatTimeTaken(job.timeTaken)}</td>
+                
+                {/* Functional Eye Icon Action Button */}
                 <td className="py-4 px-4 text-right">
-                  <button className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block">
+                  <button 
+                    onClick={() => navigate(`/migrations/${job.jobId}`)}
+                    title="View Migration Details"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 dark:hover:text-blue-400 transition-colors inline-flex items-center justify-center"
+                  >
                     <Eye className="w-4 h-4" />
                   </button>
                 </td>
