@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'; // <-- 1. Import useNavigate
 import { X, CloudUpload, Play } from 'lucide-react';
 import { useStartMigration } from '../../hooks/useStartMigration';
 import type { MigrationTriggerForm } from '../../types/migration';
+import { DEFAULT_REPO_STORAGE_KEY } from './SettingsScreen';
 
 interface NewMigrationModalProps {
   isOpen: boolean;
@@ -16,15 +17,15 @@ export default function NewMigrationModal({ isOpen, onClose }: NewMigrationModal
   const { mutate, isPending } = useStartMigration();
   const navigate = useNavigate(); // <-- 2. Initialize the navigate hook
 
-  const [formData, setFormData] = useState<MigrationTriggerForm>({
-    repositoryUrl: '',
+  const [formData, setFormData] = useState<MigrationTriggerForm>(() => ({
+    repositoryUrl: localStorage.getItem(DEFAULT_REPO_STORAGE_KEY) || '',
     sourceType: 'FILE',
     targetType: 'FILE',
     sourceUrl: '',
     sourceFile: null,
     targetUrl: '',
     targetFile: null,
-  });
+  }));
 
   if (!isOpen) return null;
 
@@ -46,8 +47,9 @@ export default function NewMigrationModal({ isOpen, onClose }: NewMigrationModal
       // Your Java MigrationTriggerResponse DTO returns 'jobId'.
       onSuccess: (response: { jobId?: string; job_id?: string } | undefined) => {
         onClose();
+        const savedRepo = localStorage.getItem(DEFAULT_REPO_STORAGE_KEY) || '';
         setFormData({
-          repositoryUrl: '', sourceType: 'FILE', targetType: 'FILE',
+          repositoryUrl: savedRepo, sourceType: 'FILE', targetType: 'FILE',
           sourceUrl: '', sourceFile: null, targetUrl: '', targetFile: null,
         });
 
