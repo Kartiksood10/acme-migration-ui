@@ -51,7 +51,7 @@ The UI strictly separates visual layout components (`AppLayout.tsx`) from the da
 
 ### 1. Dashboard (`/`)
 
-The high-level command center. Displays aggregate metrics, active running jobs, and a quick-access table of recent migrations.
+The high-level command center. Displays aggregate metrics, active running jobs, and a quick-access table of recent migrations. A new migration can be started by clicking the **"New Migration"** button, which opens a configuration modal to input the target Git repository URL (automatically pre-filled from your saved Settings), select source and target formats (OpenAPI/Swagger or URL/File), and upload API contract specifications.
 
 ### 2. Migration Details (`/migrations/:jobId`)
 
