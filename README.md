@@ -1,6 +1,6 @@
 # API Contract Migration Engine (ACME) Web Dashboard
 
-**The real-time, responsive control center for triggering, monitoring, and reviewing autonomous AI-driven API contract migrations.**
+**The Frontend UI control center for triggering, monitoring, and reviewing autonomous AI-driven API contract migrations.**
 
 The ACME Web Dashboard acts as the Frontend User interface for the ACME ecosystem. While the [ACME Backend](https://github.com/Kartiksood10/acme-migration-backend) manages state and the [ACME Worker](https://github.com/Kartiksood10/acme-migration-worker) handles autonomous code generation, this React-based frontend provides engineers with a seamless, zero-refresh experience to oversee the entire lifecycle of an API migration.
 
